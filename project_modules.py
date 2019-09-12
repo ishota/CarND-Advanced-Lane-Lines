@@ -4,9 +4,8 @@ import matplotlib.pyplot as plt
 
 
 def correct_distortion(img):
-    extract_obj_img_points(img)
-    gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     is_found, obj_p, img_p = extract_obj_img_points(img)
+    gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     if is_found:
         ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(obj_p, img_p, (gray.shape[0], gray.shape[1]), None, None)
         undist = cv2.undistort(img, mtx, dist, None, mtx)

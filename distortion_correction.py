@@ -2,6 +2,7 @@
 
 from project_modules import *
 from PIL import Image
+import numpy as np
 import glob
 import os
 import matplotlib.pyplot as plt
@@ -55,4 +56,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    

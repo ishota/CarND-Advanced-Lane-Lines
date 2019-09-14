@@ -3,6 +3,12 @@ import cv2
 import numpy as np
 
 
+def get_s_channel_image(img):
+    hls_image = cv2.cvtColor(img, cv2.COLOR_RGB2HLS)
+    s_channel_image = hls_image[:, :, 2]
+    return s_channel_image
+
+
 def correct_distortion_and_transform(img):
     is_found, obj_p, img_p = extract_obj_img_points(img)
     if is_found:

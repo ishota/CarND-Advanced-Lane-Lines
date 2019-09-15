@@ -12,7 +12,7 @@ def main():
     # initial setting
     images = glob.glob(os.path.join("./test_images/", "*.jpg"))
     num_images = len(images)
-    num_kind = 6
+    num_kind = 7
     fig, axs = plt.subplots(num_kind, num_images, figsize=(FIGURE_SIZE[0]*num_images, FIGURE_SIZE[1]*num_kind))
     plt.subplots_adjust(wspace=W_SPACE, hspace=H_SPACE)
     plot_count = 0
@@ -52,7 +52,7 @@ def main():
     # apply x direction gradient threshold
     gradient_list = []
     for i in range(num_images):
-        gradient_list.append(apply_threshold_gradient(sobel_list[i]))
+        gradient_list.append(apply_gradient_threshold(sobel_list[i]))
         axs[plot_count, i].imshow(gradient_list[i])
         axs[plot_count, i].axis("off")
     plot_count += 1
@@ -64,6 +64,11 @@ def main():
         axs[plot_count, i].imshow(color_gradient_list[i])
         axs[plot_count, i].axis("off")
     plot_count += 1
+
+    # check fine lane module
+    for i in range(num_images):
+        axs[plot_count, i].imshow(find_lane(im_list[i]), cmap='gray')
+        axs[plot_count, i].axis("off")
 
     # save result at 'output_images' directory
     plt.savefig('output_images/result_fine_lane.jpg')

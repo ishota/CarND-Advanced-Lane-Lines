@@ -3,11 +3,24 @@ import cv2
 import numpy as np
 
 
-def marge_color_gradient_image(color_img, gradient_img, s_thresh=S_COLOR_THRESH):
-    return np.dstack((np.zeros_like(gradient_img), gradient_img, color_img)) * 255
+def find_lane(img):
+    s_channel_image = get_s_channel_image(img)
+    color_threshold_img = apply_color_threshold(s_channel_image)
+    sobel_filtered_img = apply_sobel_filter(s_channel_image)
+    gradient_threshold_img = apply_gradient_threshold(sobel_filtered_img)
+    return marge_color_gradient_image(color_threshold_img, gradient_threshold_img, True)
 
 
-def apply_threshold_gradient(scaled_sobel, sx_thresh=SX_THRESH):
+def marge_color_gradient_image(color_img, gradient_img, is_gray_scale=False):
+    if is_gray_scale:
+        marge_img = np.zeros_like(gradient_img)
+        marge_img[(color_img == 1) | (gradient_img == 1)] = 1
+        return marge_img
+    else:
+        return np.dstack((np.zeros_like(gradient_img), gradient_img, color_img)) * 255
+
+
+def apply_gradient_threshold(scaled_sobel, sx_thresh=SX_THRESH):
     sxbinary = np.zeros_like(scaled_sobel)
     sxbinary[(scaled_sobel >= sx_thresh[0]) & (scaled_sobel <= sx_thresh[1])] = 1
     return sxbinary

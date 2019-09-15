@@ -2,6 +2,7 @@
   <dictionary name="ishot">
     <words>
       <w>rvecs</w>
+      <w>sbinary</w>
       <w>sobel</w>
       <w>sobelx</w>
       <w>sxbinary</w>

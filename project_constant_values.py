@@ -1,5 +1,8 @@
 import cv2
 
+# color threshold
+S_COLOR_THRESH = (180, 253)
+
 # gradient threshold
 SX_THRESH = (25, 80)
 

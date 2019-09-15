@@ -3,9 +3,13 @@ import cv2
 import numpy as np
 
 
-def apply_threshold_gradient(scaled_sobel, s_thresh=SX_THRESH):
+def marge_color_gradient_image(color_img, gradient_img, s_thresh=S_COLOR_THRESH):
+    return np.dstack((np.zeros_like(gradient_img), gradient_img, color_img)) * 255
+
+
+def apply_threshold_gradient(scaled_sobel, sx_thresh=SX_THRESH):
     sxbinary = np.zeros_like(scaled_sobel)
-    sxbinary[(scaled_sobel >= s_thresh[0]) & (scaled_sobel <= s_thresh[1])] = 1
+    sxbinary[(scaled_sobel >= sx_thresh[0]) & (scaled_sobel <= sx_thresh[1])] = 1
     return sxbinary
 
 
@@ -14,6 +18,12 @@ def apply_sobel_filter(s_channel_img):
     abs_sobelx = np.absolute(sobel)
     scaled_sobel = np.uint8(255*abs_sobelx / np.max(abs_sobelx))
     return scaled_sobel
+
+
+def apply_color_threshold(s_channel_img, s_thresh=S_COLOR_THRESH):
+    s_binary = np.zeros_like(s_channel_img)
+    s_binary[(s_channel_img >= s_thresh[0]) & (s_channel_img <= s_thresh[1])] = 1
+    return s_binary
 
 
 def get_s_channel_image(img):

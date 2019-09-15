@@ -36,11 +36,10 @@ def main():
     # create binary image applied s threshold
     sobel_list = []
     for i in range(num_images):
-        sobel_list.append(cv2.Sobel(s_channel_list[i], cv2.CV_64F, 1, 0))
+        sobel_list.append(apply_sobel_filter(s_channel_list[i]))
         axs[plot_count, i].imshow(sobel_list[i])
         axs[plot_count, i].axis("off")
     plot_count += 1
-
 
     # save result at 'output_images' directory
     plt.savefig('output_images/result_fine_lane.jpg')

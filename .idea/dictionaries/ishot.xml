@@ -2,6 +2,8 @@
   <dictionary name="ishot">
     <words>
       <w>rvecs</w>
+      <w>sobel</w>
+      <w>sobelx</w>
       <w>tvecs</w>
       <w>undist</w>
     </words>

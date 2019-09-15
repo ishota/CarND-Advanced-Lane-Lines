@@ -3,6 +3,13 @@ import cv2
 import numpy as np
 
 
+def apply_sobel_filter(s_channel_img):
+    sobel = cv2.Sobel(s_channel_img, cv2.CV_64F, 1, 0)
+    abs_sobelx = np.absolute(sobel)
+    scaled_sobel = np.uint8(255*abs_sobelx / np.max(abs_sobelx))
+    return scaled_sobel
+
+
 def get_s_channel_image(img):
     hls_image = cv2.cvtColor(img, cv2.COLOR_RGB2HLS)
     s_channel_image = hls_image[:, :, 2]

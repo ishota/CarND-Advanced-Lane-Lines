@@ -12,7 +12,7 @@ def main():
     # initial setting
     images = glob.glob(os.path.join("./test_images/", "*.jpg"))
     num_images = len(images)
-    num_kind = 3
+    num_kind = 4
     fig, axs = plt.subplots(num_kind, num_images, figsize=(FIGURE_SIZE[0]*num_images, FIGURE_SIZE[1]*num_kind))
     plt.subplots_adjust(wspace=W_SPACE, hspace=H_SPACE)
     plot_count = 0
@@ -38,6 +38,14 @@ def main():
     for i in range(num_images):
         sobel_list.append(apply_sobel_filter(s_channel_list[i]))
         axs[plot_count, i].imshow(sobel_list[i])
+        axs[plot_count, i].axis("off")
+    plot_count += 1
+
+    # apply x direction gradient threshold
+    gradient_list = []
+    for i in range(num_images):
+        gradient_list.append(apply_threshold_gradient(sobel_list[i]))
+        axs[plot_count, i].imshow(gradient_list[i])
         axs[plot_count, i].axis("off")
     plot_count += 1
 

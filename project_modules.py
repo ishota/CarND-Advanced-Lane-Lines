@@ -3,6 +3,12 @@ import cv2
 import numpy as np
 
 
+def apply_threshold_gradient(scaled_sobel, s_thresh=SX_THRESH):
+    sxbinary = np.zeros_like(scaled_sobel)
+    sxbinary[(scaled_sobel >= s_thresh[0]) & (scaled_sobel <= s_thresh[1])] = 1
+    return sxbinary
+
+
 def apply_sobel_filter(s_channel_img):
     sobel = cv2.Sobel(s_channel_img, cv2.CV_64F, 1, 0)
     abs_sobelx = np.absolute(sobel)

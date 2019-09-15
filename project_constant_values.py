@@ -1,5 +1,8 @@
 import cv2
 
+# gradient threshold
+SX_THRESH = (25, 80)
+
 # setting for subplot
 FIGURE_SIZE = (12.8, 7.2)
 W_SPACE = 0.01

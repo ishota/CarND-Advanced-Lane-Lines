@@ -22,6 +22,8 @@ def birds_eye_view(img):
     # source_point = np.float32([[h/8, v], [7*h/8, v], [3*h/8, v/2], [5*h/8, v/2]])
     destination_point = np.float32([[OFFSET, OFFSET], [img.shape[1] - OFFSET, OFFSET],
                                     [OFFSET, img.shape[0] - OFFSET], [img.shape[1] - OFFSET, img.shape[0] - OFFSET]])
+    destination_point = np.float32([[OFFSET, 0], [img.shape[1] - OFFSET, 0],
+                                    [OFFSET, img.shape[0]], [img.shape[1] - OFFSET, img.shape[0]]])
     transition_mtx = cv2.getPerspectiveTransform(source_point, destination_point)
     return cv2.warpPerspective(img, transition_mtx, (img.shape[1], img.shape[0]), flags=cv2.INTER_LINEAR)
 

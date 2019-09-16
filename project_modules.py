@@ -8,7 +8,22 @@ def find_lane(img):
     color_threshold_img = apply_color_threshold(s_channel_image)
     sobel_filtered_img = apply_sobel_filter(s_channel_image)
     gradient_threshold_img = apply_gradient_threshold(sobel_filtered_img)
-    return marge_color_gradient_image(color_threshold_img, gradient_threshold_img, True)
+    marge_img = marge_color_gradient_image(color_threshold_img, gradient_threshold_img, True)
+    return birds_eye_view(marge_img)
+
+
+def birds_eye_view(img):
+    v = img.shape[0]
+    h = img.shape[1]
+    # source_point = np.float32([[v/2, 3*h/8], [v, h/8], [v/2, 5*h/8], [v, 7*h/8]])
+    # source_point = np.float32([[3*h/8, v/2], [h/8, v], [5*h/8, v/2], [7*h/8, v]])
+    # source_point = np.float32([[0.45*h, v/2], [0.55*h, v/2], [h/8, v], [7*h/8, v]])
+    source_point = np.float32([[577, 450], [703, 450], [100, 690], [1180, 690]])
+    # source_point = np.float32([[h/8, v], [7*h/8, v], [3*h/8, v/2], [5*h/8, v/2]])
+    destination_point = np.float32([[OFFSET, OFFSET], [img.shape[1] - OFFSET, OFFSET],
+                                    [OFFSET, img.shape[0] - OFFSET], [img.shape[1] - OFFSET, img.shape[0] - OFFSET]])
+    transition_mtx = cv2.getPerspectiveTransform(source_point, destination_point)
+    return cv2.warpPerspective(img, transition_mtx, (img.shape[1], img.shape[0]), flags=cv2.INTER_LINEAR)
 
 
 def marge_color_gradient_image(color_img, gradient_img, is_gray_scale=False):
@@ -62,9 +77,8 @@ def correct_distortion_and_transform(img):
             p3 = corners[N_X_POINT * (N_Y_POINT - 1), 0, :]
             p4 = corners[N_X_POINT * N_Y_POINT - 1, 0, :]
             src = np.float32([p1, p2, p3, p4])
-            offset = 75
-            dst = np.float32([[offset, offset], [undist.shape[1] - offset, offset], [offset, undist.shape[0] - offset],
-                              [undist.shape[1] - offset, undist.shape[0] - offset]])
+            dst = np.float32([[OFFSET, OFFSET], [undist.shape[1] - OFFSET, OFFSET], [OFFSET, undist.shape[0] - OFFSET],
+                              [undist.shape[1] - OFFSET, undist.shape[0] - OFFSET]])
             trans_mtx = cv2.getPerspectiveTransform(src, dst)
             warped = cv2.warpPerspective(undist, trans_mtx, (undist.shape[1], undist.shape[0]), flags=cv2.INTER_LINEAR)
             return warped

@@ -12,7 +12,7 @@ def main():
     # initial setting
     images = glob.glob(os.path.join("./test_images/", "*.jpg"))
     num_images = len(images)
-    num_kind = 7
+    num_kind = 8
     fig, axs = plt.subplots(num_kind, num_images, figsize=(FIGURE_SIZE[0]*num_images, FIGURE_SIZE[1]*num_kind))
     plt.subplots_adjust(wspace=W_SPACE, hspace=H_SPACE)
     plot_count = 0
@@ -53,13 +53,27 @@ def main():
     plot_count += 1
 
     # marge color and gradient images
-    color_gradient_list = []
+    color_marge_list = []
+    gray_marge_list = []
     for i in range(num_images):
-        color_gradient_list.append(marge_color_gradient_image(s_threshold_list[i], gradient_list[i]))
-        axs[plot_count, i].imshow(color_gradient_list[i])
+        color_marge_list.append(marge_color_gradient_image(s_threshold_list[i], gradient_list[i]))
+        gray_marge_list.append(marge_color_gradient_image(s_threshold_list[i], gradient_list[i], True))
+        axs[plot_count, i].imshow(marge_color_gradient_image(s_threshold_list[i], gradient_list[i]))
     plot_count += 1
 
-    # check fine lane module
+    # birds eye view
+    birds_eye_img_list = []
+    for i in range(num_images):
+        birds_eye_img_list.append(birds_eye_view(gray_marge_list[i]))
+        axs[plot_count, i].imshow(birds_eye_view(color_marge_list[i]))
+    plot_count += 1
+
+    # detect lane area
+    # for i in range(num_images):
+    #     axs[plot_count, i].imshow(compute_histogram(birds_eye_img_list[i]))
+    # plot_count += 1
+
+    # check find lane module
     for i in range(num_images):
         axs[plot_count, i].imshow(find_lane(im_list[i]), cmap='gray')
 

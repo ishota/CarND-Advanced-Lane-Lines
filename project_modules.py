@@ -2,21 +2,7 @@ from project_constant_values import *
 import cv2
 import numpy as np
 
-
-def get_frame_list(video_path):
-    cap = cv2.VideoCapture(video_path)
-    if not cap.isOpened():
-        print('no movie and exit this')
-        exit()
-    count = cap.get(cv2.CAP_PROP_FRAME_COUNT)
-    image_list = []
-    for n in range(int(count)):
-        cap.set(cv2.CAP_PROP_POS_FRAMES, n)
-        ret, frame = cap.read()
-        if ret:
-            image_list.append(frame)
-        else:
-            return image_list
+import matplotlib.pyplot as plt
 
 
 def find_lane(img):
@@ -28,11 +14,18 @@ def find_lane(img):
     return birds_eye_view(marge_img)
 
 
+def compute_histogram(img):
+    bottom_half = img[img.shape[0]//2:, :]
+    histogram = np.sum(bottom_half, axis=0)
+    return histogram
+
+
 def birds_eye_view(img):
     destination_point = np.float32([[MARGIN, 0], [img.shape[1] - MARGIN, 0],
                                     [MARGIN, img.shape[0]], [img.shape[1] - MARGIN, img.shape[0]]])
     transition_mtx = cv2.getPerspectiveTransform(SOURCE_POINT, destination_point)
-    return cv2.warpPerspective(img, transition_mtx, (img.shape[1], img.shape[0]), flags=cv2.INTER_LINEAR)
+    birds_eye_img = cv2.warpPerspective(img, transition_mtx, (img.shape[1], img.shape[0]), flags=cv2.INTER_LINEAR)
+    return birds_eye_img
 
 
 def marge_color_gradient_image(color_img, gradient_img, is_gray_scale=False):
@@ -129,3 +122,19 @@ def extract_obj_img_points(img, do_plot=False):
         return corners_img
     else:
         return is_found, objpoints, imgpoints
+
+
+def get_frame_list(video_path):
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        print('no movie and exit this')
+        exit()
+    count = cap.get(cv2.CAP_PROP_FRAME_COUNT)
+    image_list = []
+    for n in range(int(count)):
+        cap.set(cv2.CAP_PROP_POS_FRAMES, n)
+        ret, frame = cap.read()
+        if ret:
+            image_list.append(frame)
+        else:
+            return image_list

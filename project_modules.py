@@ -13,18 +13,9 @@ def find_lane(img):
 
 
 def birds_eye_view(img):
-    v = img.shape[0]
-    h = img.shape[1]
-    # source_point = np.float32([[v/2, 3*h/8], [v, h/8], [v/2, 5*h/8], [v, 7*h/8]])
-    # source_point = np.float32([[3*h/8, v/2], [h/8, v], [5*h/8, v/2], [7*h/8, v]])
-    # source_point = np.float32([[0.45*h, v/2], [0.55*h, v/2], [h/8, v], [7*h/8, v]])
-    source_point = np.float32([[577, 450], [703, 450], [100, 690], [1180, 690]])
-    # source_point = np.float32([[h/8, v], [7*h/8, v], [3*h/8, v/2], [5*h/8, v/2]])
-    destination_point = np.float32([[OFFSET, OFFSET], [img.shape[1] - OFFSET, OFFSET],
-                                    [OFFSET, img.shape[0] - OFFSET], [img.shape[1] - OFFSET, img.shape[0] - OFFSET]])
-    destination_point = np.float32([[OFFSET, 0], [img.shape[1] - OFFSET, 0],
-                                    [OFFSET, img.shape[0]], [img.shape[1] - OFFSET, img.shape[0]]])
-    transition_mtx = cv2.getPerspectiveTransform(source_point, destination_point)
+    destination_point = np.float32([[MARGIN, 0], [img.shape[1] - MARGIN, 0],
+                                    [MARGIN, img.shape[0]], [img.shape[1] - MARGIN, img.shape[0]]])
+    transition_mtx = cv2.getPerspectiveTransform(SOURCE_POINT, destination_point)
     return cv2.warpPerspective(img, transition_mtx, (img.shape[1], img.shape[0]), flags=cv2.INTER_LINEAR)
 
 

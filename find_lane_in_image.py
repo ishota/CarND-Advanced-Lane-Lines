@@ -22,7 +22,6 @@ def main():
     for i in range(num_images):
         im_list.append(np.array(Image.open(images[i])))
         axs[plot_count, i].imshow(im_list[i])
-        axs[plot_count, i].axis("off")
     plot_count += 1
 
     # convert to HLS color space and separate the S channel
@@ -30,7 +29,6 @@ def main():
     for i in range(num_images):
         s_channel_list.append(get_s_channel_image(im_list[i]))
         axs[plot_count, i].imshow(s_channel_list[i])
-        axs[plot_count, i].axis("off")
     plot_count += 1
 
     # create binary image applied s threshold
@@ -38,7 +36,6 @@ def main():
     for i in range(num_images):
         s_threshold_list.append(apply_color_threshold(s_channel_list[i]))
         axs[plot_count, i].imshow(s_threshold_list[i])
-        axs[plot_count, i].axis("off")
     plot_count += 1
 
     # create x direction sobel filter
@@ -46,7 +43,6 @@ def main():
     for i in range(num_images):
         sobel_list.append(apply_sobel_filter(s_channel_list[i]))
         axs[plot_count, i].imshow(sobel_list[i])
-        axs[plot_count, i].axis("off")
     plot_count += 1
 
     # apply x direction gradient threshold
@@ -54,7 +50,6 @@ def main():
     for i in range(num_images):
         gradient_list.append(apply_gradient_threshold(sobel_list[i]))
         axs[plot_count, i].imshow(gradient_list[i])
-        axs[plot_count, i].axis("off")
     plot_count += 1
 
     # marge color and gradient images
@@ -62,13 +57,11 @@ def main():
     for i in range(num_images):
         color_gradient_list.append(marge_color_gradient_image(s_threshold_list[i], gradient_list[i]))
         axs[plot_count, i].imshow(color_gradient_list[i])
-        # axs[plot_count, i].axis("off")
     plot_count += 1
 
     # check fine lane module
     for i in range(num_images):
         axs[plot_count, i].imshow(find_lane(im_list[i]), cmap='gray')
-        # axs[plot_count, i].axis("off")
 
     # save result at 'output_images' directory
     plt.savefig('output_images/result_fine_lane.jpg')

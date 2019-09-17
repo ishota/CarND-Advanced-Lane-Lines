@@ -3,6 +3,22 @@ import cv2
 import numpy as np
 
 
+def get_frame_list(video_path):
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        print('no movie and exit this')
+        exit()
+    count = cap.get(cv2.CAP_PROP_FRAME_COUNT)
+    image_list = []
+    for n in range(int(count)):
+        cap.set(cv2.CAP_PROP_POS_FRAMES, n)
+        ret, frame = cap.read()
+        if ret:
+            image_list.append(frame)
+        else:
+            return image_list
+
+
 def find_lane(img):
     s_channel_image = get_s_channel_image(img)
     color_threshold_img = apply_color_threshold(s_channel_image)

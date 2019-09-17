@@ -1,6 +1,9 @@
 import cv2
 import numpy as np
 
+# movie path
+MOVIE_PATH = 'project_video.mp4'
+
 # perspective src point (left up, right up, left down, right down)
 SOURCE_POINT = np.float32([[567.5, 470], [720.5, 470], [275, 670], [1034.5, 670]])
 

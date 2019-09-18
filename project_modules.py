@@ -12,7 +12,7 @@ def find_lane(img):
     gradient_threshold_img = apply_gradient_threshold(sobel_filtered_img)
     marge_img = marge_color_gradient_image(color_threshold_img, gradient_threshold_img, True)
     birds_eye_img = birds_eye_view(marge_img)
-    polynomial_fit_img, _, _ = fit_polynomial(birds_eye_img)
+    polynomial_fit_img = fit_polynomial(birds_eye_img)
     return polynomial_fit_img
 
 
@@ -30,16 +30,19 @@ def fit_polynomial(img):
         left_fitx = 1*ploty**2 + 1*ploty
         right_fitx = 1*ploty**2 + 1*ploty
 
-    y = np.arange(img.shape[0])
-    left_points = np.array([y, left_fitx]).T
-    right_points = np.array([y, right_fitx]).T
+    y = np.arange(img.shape[0], dtype=int)
+    left_points = np.array([left_fitx, y]).T
+    right_points = np.array([right_fitx, y]).T
     left_points = left_points.reshape(1, -1, 2)
     right_points = right_points.reshape(1, -1, 2)
 
     out_img[lefty, leftx] = [255, 0, 0]
     out_img[righty, rightx] = [0, 0, 255]
 
-    return out_img, left_points, right_points
+    cv2.polylines(out_img, left_points.astype(int), False, color=(255, 255, 0), thickness=5)
+    cv2.polylines(out_img, right_points.astype(int), False, color=(255, 255, 0), thickness=5)
+
+    return out_img
 
 
 def region_of_interest(img):

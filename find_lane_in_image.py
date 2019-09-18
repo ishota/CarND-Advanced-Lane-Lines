@@ -69,6 +69,7 @@ def main():
     plot_count += 1
 
     # detect lane area
+    # region_of_interest(birds_eye_img_list[0])
     # for i in range(num_images):
     #     axs[plot_count, i].imshow(compute_histogram(birds_eye_img_list[i]))
     # plot_count += 1

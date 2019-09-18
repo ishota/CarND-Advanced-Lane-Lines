@@ -4,6 +4,11 @@ import numpy as np
 # movie path
 MOVIE_PATH = 'project_video.mp4'
 
+# the number of sliding windows
+N_WINDOWS = 9
+WINDOW_WIDTH = 100
+MIN_PIX = 50
+
 # perspective src point (left up, right up, left down, right down)
 SOURCE_POINT = np.float32([[567.5, 470], [720.5, 470], [275, 670], [1034.5, 670]])
 

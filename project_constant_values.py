@@ -11,6 +11,9 @@ MIN_PIX = 50
 
 # perspective src point (left up, right up, left down, right down)
 SOURCE_POINT = np.float32([[567.5, 470], [720.5, 470], [275, 670], [1034.5, 670]])
+CURVE_POINT = 50
+YM_PER_PIX = 30/720
+XM_PER_PIX = 3.7/690
 
 # color threshold
 S_COLOR_THRESH = (180, 253)

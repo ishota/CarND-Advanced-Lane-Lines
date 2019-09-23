@@ -13,8 +13,8 @@ def find_lane(img):
     marge_img = marge_color_gradient_image(color_threshold_img, gradient_threshold_img, True)
     birds_eye_img = birds_eye_view(marge_img)
     polynomial_fit_img, left_c, right_c, left_line, right_line = fit_polynomial(birds_eye_img)
-    put_lane_information(img, polynomial_fit_img, (left_c, right_c))
-    return polynomial_fit_img
+    info_img = put_lane_information(img, polynomial_fit_img, (left_c, right_c))
+    return info_img
 
 
 def put_lane_information(img, polynomial_fit_img, curvatures):
@@ -29,9 +29,6 @@ def put_lane_information(img, polynomial_fit_img, curvatures):
     cv2.putText(info_img, str(left_c) + ' m', (200, 300), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 4)
     right_c = round(curvatures[1], 2)
     cv2.putText(info_img, str(right_c) + ' m', (880, 300), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 4)
-    plt.close()
-    plt.imshow(info_img)
-    plt.show()
     return info_img
 
 
@@ -240,3 +237,14 @@ def get_frame_list(video_path):
             image_list.append(frame)
         else:
             return image_list
+
+
+def convert_frame_to_video(image_list, name, result_dir_path):
+
+    fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+    shape1 = image_list[0].shape[1]
+    shape2 = image_list[0].shape[0]
+    video = cv2.VideoWriter('{}{}.mp4'.format(result_dir_path, name), fourcc, 20.0, (shape1, shape2))
+
+    for image in image_list:
+        video.write(image)

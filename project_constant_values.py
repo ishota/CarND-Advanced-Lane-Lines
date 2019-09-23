@@ -1,8 +1,10 @@
 import cv2
 import numpy as np
 
-# movie path
+# movie
 MOVIE_PATH = 'project_video.mp4'
+MOVIE_NAME = 'project_video_result.mp4'
+RESULT_PATH = 'output_videos/'
 
 # the number of sliding windows
 N_WINDOWS = 9

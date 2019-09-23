@@ -68,12 +68,6 @@ def main():
         axs[plot_count, i].imshow(birds_eye_view(color_marge_list[i]))
     plot_count += 1
 
-    # detect lane area
-    # region_of_interest(birds_eye_img_list[0])
-    # for i in range(num_images):
-    #     axs[plot_count, i].imshow(compute_histogram(birds_eye_img_list[i]))
-    # plot_count += 1
-
     # check find lane module
     for i in range(num_images):
         axs[plot_count, i].imshow(find_lane(im_list[i]), cmap='gray')

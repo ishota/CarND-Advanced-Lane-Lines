@@ -4,6 +4,17 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 
+def find_movie_lane(img, pre_left_fit, pre_right_fit):
+    s_channel_image = get_s_channel_image(img)
+    color_threshold_img = apply_color_threshold(s_channel_image)
+    sobel_filtered_img = apply_sobel_filter(s_channel_image)
+    gradient_threshold_img = apply_gradient_threshold(sobel_filtered_img)
+    marge_img = marge_color_gradient_image(color_threshold_img, gradient_threshold_img, True)
+    birds_eye_img = birds_eye_view(marge_img)
+    polynomial_fit_img, left_c, right_c, left_line, right_line, left_f, right_f = fit_polynomial(birds_eye_img, True, pre_left_fit, pre_right_fit)
+    info_img = put_lane_information(img, polynomial_fit_img, (left_c, right_c))
+    return info_img, left_f, right_f
+
 
 def find_lane(img):
     s_channel_image = get_s_channel_image(img)
@@ -12,7 +23,7 @@ def find_lane(img):
     gradient_threshold_img = apply_gradient_threshold(sobel_filtered_img)
     marge_img = marge_color_gradient_image(color_threshold_img, gradient_threshold_img, True)
     birds_eye_img = birds_eye_view(marge_img)
-    polynomial_fit_img, left_c, right_c, left_line, right_line = fit_polynomial(birds_eye_img)
+    polynomial_fit_img, left_c, right_c, left_line = fit_polynomial(birds_eye_img)
     info_img = put_lane_information(img, polynomial_fit_img, (left_c, right_c))
     return info_img
 
@@ -38,8 +49,11 @@ def compute_rial_curvature(coefficient):
     return curvature
 
 
-def fit_polynomial(img):
-    leftx, lefty, rightx, righty, out_img = region_of_interest(img)
+def fit_polynomial(img, movie=False, pre_left_fit=None, pre_right_fit=None):
+    if pre_left_fit is not None and pre_right_fit is not None:
+        leftx, lefty, rightx, righty, out_img = region_of_pre_fit(img, pre_left_fit, pre_right_fit)
+    else:
+        leftx, lefty, rightx, righty, out_img = region_of_interest(img)
     left_fit = np.polyfit(lefty, leftx, 2)
     right_fit = np.polyfit(righty, rightx, 2)
 
@@ -64,7 +78,28 @@ def fit_polynomial(img):
     cv2.polylines(out_img, left_points.astype(int), False, color=(255, 255, 0), thickness=10)
     cv2.polylines(out_img, right_points.astype(int), False, color=(255, 255, 0), thickness=10)
 
+    if movie:
+        return out_img, compute_rial_curvature(left_fit), compute_rial_curvature(right_fit), left_points, right_points, left_fit, right_fit
+
     return out_img, compute_rial_curvature(left_fit), compute_rial_curvature(right_fit), left_points, right_points
+
+
+def region_of_pre_fit(img, pre_left_f, pre_right_f):
+    out_img = np.dstack((img, img, img))
+    nonzero = img.nonzero()
+    left_nonzero = img[:nonzero.shape[0]//2, nonzero.shape[1]]
+    right_nonzero = img[nonzero.shape[0]//2:, nonzero.shape[1]]
+
+    # nonzeroy = np.array(nonzero[0])
+    # nonzerox = np.array(nonzero[1])
+
+
+    # left_line_x = pre_left_f * nonzeroy ** 2 + pre_left_f * nonzeroy + pre_left_f
+    # right_line_x = pre_right_f * nonzeroy
+
+    # left_fitx = left_fit[0] * ploty ** 2 + left_fit[1] * ploty + left_fit[2]
+    # right_fitx = right_fit[0] * ploty ** 2 + right_fit[1] * ploty + right_fit[2]
+    return 0
 
 
 def region_of_interest(img):

@@ -23,7 +23,7 @@ def find_lane(img):
     gradient_threshold_img = apply_gradient_threshold(sobel_filtered_img)
     marge_img = marge_color_gradient_image(color_threshold_img, gradient_threshold_img, True)
     birds_eye_img = birds_eye_view(marge_img)
-    polynomial_fit_img, left_c, right_c, left_line = fit_polynomial(birds_eye_img)
+    polynomial_fit_img, left_c, right_c, left_line, right_line = fit_polynomial(birds_eye_img)
     info_img = put_lane_information(img, polynomial_fit_img, (left_c, right_c))
     return info_img
 

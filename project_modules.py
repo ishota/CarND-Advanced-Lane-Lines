@@ -86,9 +86,7 @@ def fit_polynomial(img, movie=False, pre_left_fit=None, pre_right_fit=None):
 
 def region_of_pre_fit(img, pre_left_f, pre_right_f):
     out_img = np.dstack((img, img, img))
-    nonzero = img.nonzero()
-    left_nonzero = img[:nonzero.shape[0]//2, nonzero.shape[1]]
-    right_nonzero = img[nonzero.shape[0]//2:, nonzero.shape[1]]
+    nonzero = np.array(img.nonzero())
 
     # nonzeroy = np.array(nonzero[0])
     # nonzerox = np.array(nonzero[1])

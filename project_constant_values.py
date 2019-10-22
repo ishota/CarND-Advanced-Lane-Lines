@@ -3,8 +3,11 @@ import numpy as np
 
 # movie
 MOVIE_PATH = 'project_video.mp4'
-MOVIE_NAME = 'project_video_result.mp4'
+MOVIE_NAME = 'project_video_result'
 RESULT_PATH = 'output_videos/'
+
+# setting for advanced function for project 2
+MARGIN = 50
 
 # the number of sliding windows
 N_WINDOWS = 9

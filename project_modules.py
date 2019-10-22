@@ -49,11 +49,15 @@ def compute_rial_curvature(coefficient):
     return curvature
 
 
-def fit_polynomial(img, movie=False, pre_left_fit=None, pre_right_fit=None):
+def fit_polynomial(img, movie=False, pre_left_fit=None, pre_right_fit=None, pre_left_dots=None, pre_right_dots=None):
     if pre_left_fit is not None and pre_right_fit is not None:
         leftx, lefty, rightx, righty, out_img = region_of_pre_fit(img, pre_left_fit, pre_right_fit)
     else:
         leftx, lefty, rightx, righty, out_img = region_of_interest(img)
+
+    if leftx.size == 0 or lefty.size == 0 or rightx.size == 0 or righty.size == 0:
+        leftx, lefty, rightx, righty, out_img = region_of_interest(img)
+
     left_fit = np.polyfit(lefty, leftx, 2)
     right_fit = np.polyfit(righty, rightx, 2)
 
@@ -87,17 +91,28 @@ def fit_polynomial(img, movie=False, pre_left_fit=None, pre_right_fit=None):
 def region_of_pre_fit(img, pre_left_f, pre_right_f):
     out_img = np.dstack((img, img, img))
     nonzero = np.array(img.nonzero())
+    nonzeroy = np.array(nonzero[0])
+    nonzerox = np.array(nonzero[1])
+    nonzerox_left = np.array(nonzerox[nonzerox < img.shape[1]/2])
+    nonzeroy_left = np.array(nonzeroy[nonzerox < img.shape[1]/2])
+    nonzerox_right = np.array(nonzerox[nonzerox >= img.shape[1]/2])
+    nonzeroy_right = np.array(nonzeroy[nonzerox >= img.shape[1]/2])
 
-    # nonzeroy = np.array(nonzero[0])
-    # nonzerox = np.array(nonzero[1])
+    pre_left_func_val = pre_left_f[0] * nonzeroy_left ** 2 + pre_left_f[1] * nonzeroy_left + pre_left_f[2]
+    pre_right_func_val = pre_right_f[0] * nonzeroy_right ** 2 + pre_right_f[1] * nonzeroy_right + pre_right_f[2]
 
+    gap_left = np.abs(pre_left_func_val - nonzerox_left)
+    gap_right = np.abs(pre_right_func_val - nonzerox_right)
 
-    # left_line_x = pre_left_f * nonzeroy ** 2 + pre_left_f * nonzeroy + pre_left_f
-    # right_line_x = pre_right_f * nonzeroy
+    good_left_inds = np.array(gap_left < MARGIN)
+    good_right_inds = np.array(gap_right < MARGIN)
 
-    # left_fitx = left_fit[0] * ploty ** 2 + left_fit[1] * ploty + left_fit[2]
-    # right_fitx = right_fit[0] * ploty ** 2 + right_fit[1] * ploty + right_fit[2]
-    return 0
+    leftx = nonzerox_left[good_left_inds]
+    lefty = nonzeroy_left[good_left_inds]
+    rightx = nonzerox_right[good_right_inds]
+    righty = nonzeroy_right[good_right_inds]
+
+    return leftx, lefty, rightx, righty, out_img
 
 
 def region_of_interest(img):

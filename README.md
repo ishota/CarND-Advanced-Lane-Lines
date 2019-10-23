@@ -3,7 +3,6 @@
 This is a project for Udacity lesson of Self-driving car engineer.
 The project is Advanced Lane Finding that detects lane line in picuture and put line area on image.
 
-[camera_result]: ./output_images/result_distortion_correction.jpg
 
 ## Description
 
@@ -17,9 +16,12 @@ The project consists three steps below.
 
 You can get an image that shows process of camera calibration by using `distortion_correction.py`.
 
+[camera_result]: ./output_images/result_distortion_correction.jpg
 ![alt_txt][camera_result]
 
 The result is, from top to bottom, original image, grayscaled image, image put extracted chess board corners, undistorted images, and front view image.
+
+I used the OpenCV function of `findChessboardCorners` to find 54(=9x6) corners and `drawChessboardCorners` to color found corners.
 
 ## 2. Lane line detection (image)
 

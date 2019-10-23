@@ -3,8 +3,6 @@ from numpy.random import *
 import cv2
 import numpy as np
 
-import matplotlib.pyplot as plt
-
 
 def find_movie_lane(img, pre_left_fit, pre_right_fit, left_dots, right_dots):
     s_channel_image = get_s_channel_image(img)
@@ -61,19 +59,16 @@ def fit_polynomial(img, movie=False, pre_left_fit=None, pre_right_fit=None, left
         left_dots = np.stack([leftx, lefty])
         right_dots = np.stack([rightx, righty])
 
+    if left_dots.shape[1] < MIN_PIX:
+        leftx, lefty, _, _, out_img = region_of_interest(img)
+        left_dots = np.stack([leftx, lefty])
 
-    # if leftx.size == 0 or lefty.size == 0 or rightx.size == 0 or righty.size == 0:
-    #     leftx, lefty, rightx, righty, out_img = region_of_interest(img)
+    if right_dots.shape[1] < MIN_PIX:
+        _, _, rightx, righty, out_img = region_of_interest(img)
+        right_dots = np.stack([rightx, righty])
 
-    if leftx.size == 0 or lefty.size == 0 or rightx.size == 0 or righty.size == 0:
-        left_fit = pre_left_fit
-        right_fit = pre_right_fit
-    else:
-        left_fit = np.polyfit(lefty, leftx, 2)
-        right_fit = np.polyfit(righty, rightx, 2)
-
-    # left_fit = np.polyfit(lefty, leftx, 2)
-    # right_fit = np.polyfit(righty, rightx, 2)
+    left_fit = np.polyfit(lefty, leftx, 2)
+    right_fit = np.polyfit(righty, rightx, 2)
 
     ploty = np.linspace(0, img.shape[0]-1, img.shape[0])
     try:
@@ -111,8 +106,8 @@ def drop_out_dots(left_dots, right_dots):
     left_array = np.arange(left_size)
     right_array = np.arange(right_size)
 
-    left_del_index = choice(left_array, int(left_size/2), replace=False)
-    right_del_index = choice(right_array, int(right_size/2), replace=False)
+    left_del_index = choice(left_array, int(left_size/3), replace=False)
+    right_del_index = choice(right_array, int(right_size/3), replace=False)
 
     left_dots = np.delete(left_dots, left_del_index, 1)
     right_dots = np.delete(right_dots, right_del_index, 1)

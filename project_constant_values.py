@@ -7,7 +7,7 @@ MOVIE_NAME = 'project_video_result'
 RESULT_PATH = 'output_videos/'
 
 # setting for advanced function for project 2
-DOT_THRESHOLD = 25
+DOT_THRESHOLD = 40
 
 # the number of sliding windows
 N_WINDOWS = 9

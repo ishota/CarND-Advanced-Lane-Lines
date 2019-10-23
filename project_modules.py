@@ -1,19 +1,22 @@
 from project_constant_values import *
+from numpy.random import *
 import cv2
 import numpy as np
 
 import matplotlib.pyplot as plt
 
-def find_movie_lane(img, pre_left_fit, pre_right_fit):
+
+def find_movie_lane(img, pre_left_fit, pre_right_fit, left_dots, right_dots):
     s_channel_image = get_s_channel_image(img)
     color_threshold_img = apply_color_threshold(s_channel_image)
     sobel_filtered_img = apply_sobel_filter(s_channel_image)
     gradient_threshold_img = apply_gradient_threshold(sobel_filtered_img)
     marge_img = marge_color_gradient_image(color_threshold_img, gradient_threshold_img, True)
     birds_eye_img = birds_eye_view(marge_img)
-    polynomial_fit_img, left_c, right_c, left_line, right_line, left_f, right_f = fit_polynomial(birds_eye_img, True, pre_left_fit, pre_right_fit)
+    polynomial_fit_img, left_c, right_c, left_line, right_line, left_f, right_f, left_dots, right_dots \
+        = fit_polynomial(birds_eye_img, True, pre_left_fit, pre_right_fit, left_dots, right_dots)
     info_img = put_lane_information(img, polynomial_fit_img, (left_c, right_c))
-    return info_img, left_f, right_f
+    return info_img, left_f, right_f, left_dots, right_dots
 
 
 def find_lane(img):
@@ -49,17 +52,28 @@ def compute_rial_curvature(coefficient):
     return curvature
 
 
-def fit_polynomial(img, movie=False, pre_left_fit=None, pre_right_fit=None, pre_left_dots=None, pre_right_dots=None):
+def fit_polynomial(img, movie=False, pre_left_fit=None, pre_right_fit=None, left_dots=None, right_dots=None):
     if pre_left_fit is not None and pre_right_fit is not None:
-        leftx, lefty, rightx, righty, out_img = region_of_pre_fit(img, pre_left_fit, pre_right_fit)
+        leftx, lefty, rightx, righty, left_dots, right_dots, out_img = \
+            region_of_pre_fit(img, pre_left_fit, pre_right_fit, left_dots, right_dots)
     else:
         leftx, lefty, rightx, righty, out_img = region_of_interest(img)
+        left_dots = np.stack([leftx, lefty])
+        right_dots = np.stack([rightx, righty])
+
+
+    # if leftx.size == 0 or lefty.size == 0 or rightx.size == 0 or righty.size == 0:
+    #     leftx, lefty, rightx, righty, out_img = region_of_interest(img)
 
     if leftx.size == 0 or lefty.size == 0 or rightx.size == 0 or righty.size == 0:
-        leftx, lefty, rightx, righty, out_img = region_of_interest(img)
+        left_fit = pre_left_fit
+        right_fit = pre_right_fit
+    else:
+        left_fit = np.polyfit(lefty, leftx, 2)
+        right_fit = np.polyfit(righty, rightx, 2)
 
-    left_fit = np.polyfit(lefty, leftx, 2)
-    right_fit = np.polyfit(righty, rightx, 2)
+    # left_fit = np.polyfit(lefty, leftx, 2)
+    # right_fit = np.polyfit(righty, rightx, 2)
 
     ploty = np.linspace(0, img.shape[0]-1, img.shape[0])
     try:
@@ -83,12 +97,33 @@ def fit_polynomial(img, movie=False, pre_left_fit=None, pre_right_fit=None, pre_
     cv2.polylines(out_img, right_points.astype(int), False, color=(255, 255, 0), thickness=10)
 
     if movie:
-        return out_img, compute_rial_curvature(left_fit), compute_rial_curvature(right_fit), left_points, right_points, left_fit, right_fit
+        return out_img, compute_rial_curvature(left_fit), compute_rial_curvature(right_fit), \
+               left_points, right_points, left_fit, right_fit, left_dots, right_dots
 
     return out_img, compute_rial_curvature(left_fit), compute_rial_curvature(right_fit), left_points, right_points
 
 
-def region_of_pre_fit(img, pre_left_f, pre_right_f):
+def drop_out_dots(left_dots, right_dots):
+
+    left_size = left_dots.shape[1]
+    right_size = right_dots.shape[1]
+
+    left_array = np.arange(left_size)
+    right_array = np.arange(right_size)
+
+    left_del_index = choice(left_array, int(left_size/2), replace=False)
+    right_del_index = choice(right_array, int(right_size/2), replace=False)
+
+    left_dots = np.delete(left_dots, left_del_index, 1)
+    right_dots = np.delete(right_dots, right_del_index, 1)
+
+    return left_dots, right_dots
+
+
+def region_of_pre_fit(img, pre_left_f, pre_right_f, left_dots, right_dots):
+
+    left_dots, right_dots = drop_out_dots(left_dots, right_dots)
+
     out_img = np.dstack((img, img, img))
     nonzero = np.array(img.nonzero())
     nonzeroy = np.array(nonzero[0])
@@ -98,21 +133,29 @@ def region_of_pre_fit(img, pre_left_f, pre_right_f):
     nonzerox_right = np.array(nonzerox[nonzerox >= img.shape[1]/2])
     nonzeroy_right = np.array(nonzeroy[nonzerox >= img.shape[1]/2])
 
+    nonzerox_left = np.concatenate([nonzerox_left, np.array(left_dots[0])], 0)
+    nonzeroy_left = np.concatenate([nonzeroy_left, np.array(left_dots[1])], 0)
+    nonzerox_right = np.concatenate([nonzerox_right, np.array(right_dots[0])], 0)
+    nonzeroy_right = np.concatenate([nonzeroy_right, np.array(right_dots[1])], 0)
+
     pre_left_func_val = pre_left_f[0] * nonzeroy_left ** 2 + pre_left_f[1] * nonzeroy_left + pre_left_f[2]
     pre_right_func_val = pre_right_f[0] * nonzeroy_right ** 2 + pre_right_f[1] * nonzeroy_right + pre_right_f[2]
 
     gap_left = np.abs(pre_left_func_val - nonzerox_left)
     gap_right = np.abs(pre_right_func_val - nonzerox_right)
 
-    good_left_inds = np.array(gap_left < MARGIN)
-    good_right_inds = np.array(gap_right < MARGIN)
+    good_left_inds = np.array(gap_left < DOT_THRESHOLD)
+    good_right_inds = np.array(gap_right < DOT_THRESHOLD)
 
     leftx = nonzerox_left[good_left_inds]
     lefty = nonzeroy_left[good_left_inds]
     rightx = nonzerox_right[good_right_inds]
     righty = nonzeroy_right[good_right_inds]
 
-    return leftx, lefty, rightx, righty, out_img
+    left_dots = np.stack([leftx, lefty])
+    right_dots = np.stack([rightx, righty])
+
+    return leftx, lefty, rightx, righty, left_dots, right_dots, out_img
 
 
 def region_of_interest(img):
@@ -142,8 +185,10 @@ def region_of_interest(img):
         cv2.rectangle(out_img, (win_xleft_low, win_y_low), (win_xleft_high, win_y_high), (0, 255, 0), 2)
         cv2.rectangle(out_img, (win_xright_low, win_y_low), (win_xright_high, win_y_high), (0, 255, 0), 2)
 
-        good_left_inds = ((nonzeroy >= win_y_low) & (nonzeroy < win_y_high) & (nonzerox >= win_xleft_low) & (nonzerox < win_xleft_high)).nonzero()[0]
-        good_right_inds = ((nonzeroy >= win_y_low) & (nonzeroy < win_y_high) & (nonzerox >= win_xright_low) & (nonzerox < win_xright_high)).nonzero()[0]
+        good_left_inds = ((nonzeroy >= win_y_low) & (nonzeroy < win_y_high) &
+                          (nonzerox >= win_xleft_low) & (nonzerox < win_xleft_high)).nonzero()[0]
+        good_right_inds = ((nonzeroy >= win_y_low) & (nonzeroy < win_y_high) &
+                           (nonzerox >= win_xright_low) & (nonzerox < win_xright_high)).nonzero()[0]
 
         left_lane_inds.append(good_left_inds)
         right_lane_inds.append(good_right_inds)

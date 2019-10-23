@@ -12,8 +12,11 @@ def main():
     # detect lane line
     pre_left_fit = None
     pre_right_fit = None
+    left_dots = None
+    right_dots = None
     for n, image in enumerate(image_list):
-            image_list[n], pre_left_fit, pre_right_fit = find_movie_lane(image, pre_left_fit, pre_right_fit)
+        image_list[n], pre_left_fit, pre_right_fit, left_dots, right_dots \
+            = find_movie_lane(image, pre_left_fit, pre_right_fit, left_dots, right_dots)
 
     # create video from img
     convert_frame_to_video(image_list, MOVIE_NAME, RESULT_PATH)

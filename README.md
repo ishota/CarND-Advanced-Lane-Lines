@@ -64,6 +64,22 @@ Above result is, from top to bottom, original image, HLS color scaled image, bin
 
 <!-- Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial? -->
 
+The lane pixels were identified using an image composed of two types of images.
+
+The first image is the S color image of the HLS color map.
+S color is a saturation.
+The saturation is an element that represents the vividness and darkness of the color defined by the hue, and is often expressed in the range of 0% to 100%.
+100% is the most vivid, the color fades as the saturation decreases, and becomes gray when it reaches 0%.
+Roads are often gray.
+Since lanes are often vivid colors, it is possible to identify lane pixels using saturation.
+
+Another is an image obtained by filtering the s color image.
+This filter is called a sobel filter and can highlight the boundaries between pixels in a specific direction.
+In the case of lanes, the filter is used in the horizontal direction because it extends in the direction of travel.
+As a result, the pixel at the boundary between the road and the lane line can be identified.
+
+
+
 <!-- これは普通に説明をすればいい -->
 
 <!-- Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center. -->

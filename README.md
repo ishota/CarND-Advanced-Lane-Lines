@@ -62,6 +62,21 @@ My pipeline consisted of 7 steps.
 
 Above result is, from top to bottom, original image, HLS color scaled image, binary image made in step 2, x direction sobel filtered image, binary image made in step 4, marged binary image, birds eye view image, and original image with color lane line.
 
+<!-- Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial? -->
+
+<!-- これは普通に説明をすればいい -->
+
+<!-- Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center. -->
+
+<!-- Here the idea is to take the measurements of where the lane lines are and estimate how much the road is curving and where the vehicle is located with respect to the center of the lane. The radius of curvature may be given in meters assuming the curve of the road follows a circle. For the position of the vehicle, you may assume the camera is mounted at the center of the car and the deviation of the midpoint of the lane from the center of the image is the offset you're looking for. As with the polynomial fitting, convert from pixels to meters. -->
+
+<!-- TODO1:　ここも計算した内容を説明することにする 車線は線対称の為、近似誤差が小さいほうを採用するようにすればよい。プログラムでは書かない-->
 ## 3. Lane line detection (movie)
 
+<!-- Provide a link to your final video output. Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!) -->
+
+<!-- ここにはイメージのパイプラインと変更した点を書いて、改善したことを伝える。動画から画像をキャプチャして比較する。 -->
+
 ## Discussion
+
+<!-- Briefly discuss any problems / issues you faced in your implementation of this project. Where will your pipeline likely fail? What could you do to make it more robust? -->

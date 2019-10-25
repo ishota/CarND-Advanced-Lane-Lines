@@ -46,7 +46,21 @@ If you know more information about camera distortion, please reference the docum
 
 ## 2. Lane line detection (image)
 
+You can get an image that shows process of lane line finding by using `find_lane_in_image.py`.
+My pipeline consisted of 7 steps. 
 
+1. Convert the images to HLS color scale.
+2. Create binary image applied s value threshold.
+3. Apply x direction sobel filter is applied to HLS color scale made in step 1.
+4. Create binary image applied x direction gradient threshold.
+5. Marge binary images crated in step 2 and 4.
+6. Transform image perspective from original to birds eye view.
+7. Put a line approximated by a quadratic function on birds eye view image, then transform image to original view.
+
+[image_result]: ./output_images/result_fine_lane.jpg
+![alt_txt][image_result]
+
+Above result is, from top to bottom, original image, HLS color scaled image, binary image made in step 2, x direction sobel filtered image, binary image made in step 4, marged binary image, birds eye view image, and original image with color lane line.
 
 ## 3. Lane line detection (movie)
 

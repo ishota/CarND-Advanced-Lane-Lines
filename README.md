@@ -7,7 +7,7 @@ The project is Advanced Lane Finding that detects lane line in picuture and put 
 
 ## Quick start guide
 
-Below python files output image or video file.
+Below python files output image or video file after make directory `output_images` and `output_videos`. 
 
 - `distortion_correction.py` -> `output_images/result_distortion_correction.jpg`
 - `find_lane_in_image.py` -> `output_images/result_fine_lane.jpg`

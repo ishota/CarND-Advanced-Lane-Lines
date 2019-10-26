@@ -3,12 +3,6 @@
 This is a project for Udacity lesson of Self-driving car engineer.
 The project is Advanced Lane Finding that detects lane line in picuture and put line area on image.
 
-## Quick start guide
-
-- `distortion_correction.py` -> `output_images/result_distortion_correction.jpg`
-- `find_lane_in_image.py` -> `output_images/result_fine_lane.jpg`
-- `find_lane_in_movie.py` -> `output_videos/project_video_result`
-
 ## Description
 
 The project consists three steps below.

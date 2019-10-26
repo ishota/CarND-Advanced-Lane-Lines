@@ -1,5 +1,7 @@
 # CarND-Advanced-Lane-Lines
 
+*Details of this project can be found in Writeup.md.*
+
 This is a project for Udacity lesson of Self-driving car engineer.
 The project is Advanced Lane Finding that detects lane line in picuture and put line area on image.
 

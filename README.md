@@ -5,9 +5,13 @@ The project is Advanced Lane Finding that detects lane line in picuture and put 
 
 ## Quick start guide
 
+Below python files output image or video file.
+
 - `distortion_correction.py` -> `output_images/result_distortion_correction.jpg`
 - `find_lane_in_image.py` -> `output_images/result_fine_lane.jpg`
 - `find_lane_in_movie.py` -> `output_videos/project_video_result`
+
+`project_constant_value.py` contains the constants and parameters used in this project.
 
 ## Description
 

@@ -62,8 +62,6 @@ My pipeline consisted of 7 steps.
 
 Above result is, from top to bottom, original image, HLS color scaled image, binary image made in step 2, x direction sobel filtered image, binary image made in step 4, marged binary image, birds eye view image, and original image with color lane line.
 
-<!-- Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial? -->
-
 The lane pixels were identified using an image composed of two types of images.
 
 The first image is the S color image of the HLS color map.
@@ -78,16 +76,47 @@ This filter is called a sobel filter and can highlight the boundaries between pi
 In the case of lanes, the filter is used in the horizontal direction because it extends in the direction of travel.
 As a result, the pixel at the boundary between the road and the lane line can be identified.
 
+Next, I draw approximated line.
+I calculate a number of pixel which identified by previous function to detect area near lane line left and right separately.
+Then, I fit a quadratic function to pixel in the area.
 
-
-<!-- これは普通に説明をすればいい -->
-
-<!-- Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center. -->
+Finally I put the radius of curvature of each lane line on image.
+I use YM_PER_PIX 720 / 30 [pixel / m] and CURVE_POINT 50 to conversion in y from pixels space to meters.
+And I calculate curvature in below function.
+```
+def compute_rial_curvature(coefficient):
+    y_eval = CURVE_POINT*YM_PER_PIX
+    curvature = ((1 + (2*coefficient[0]*y_eval + coefficient[1])**2)**1.5) / np.absolute(2*coefficient[0])
+    return curvature
+```
 
 <!-- Here the idea is to take the measurements of where the lane lines are and estimate how much the road is curving and where the vehicle is located with respect to the center of the lane. The radius of curvature may be given in meters assuming the curve of the road follows a circle. For the position of the vehicle, you may assume the camera is mounted at the center of the car and the deviation of the midpoint of the lane from the center of the image is the offset you're looking for. As with the polynomial fitting, convert from pixels to meters. -->
 
 <!-- TODO1:　ここも計算した内容を説明することにする 車線は線対称の為、近似誤差が小さいほうを採用するようにすればよい。プログラムでは書かない-->
+
 ## 3. Lane line detection (movie)
+
+A result of movies in output_videos directory.
+A project_video_result_histogram.mp4 is movie file made by lane line detection algorithm at step 2.
+
+[histo_1]: ./output_videos/histo_1.png
+[histo_2]: ./output_videos/histo_2.png
+[histo_3]: ./output_videos/histo_3.png
+[propose_1]: ./output_videos/propose_1.png
+[propose_2]: ./output_videos/propose_2.png
+[propose_3]: ./output_videos/propose_3.png
+
+| ![alt_txt][histo_1] | ![alt_txt][propose_1] |
+| ---- | ---- |
+| ![alt_txt][histo_2] | ![alt_txt][propose_1] |
+| ![alt_txt][histo_3] | ![alt_txt][propose_1] |
+
+A result of movies in output_videos/project_video_result_histogram.mp4 and output_video/project_video_result_proposed.mp4.
+
+
+
+
+
 
 <!-- Provide a link to your final video output. Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!) -->
 

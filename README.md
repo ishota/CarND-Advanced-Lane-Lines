@@ -89,15 +89,22 @@ def compute_rial_curvature(coefficient):
     curvature = ((1 + (2*coefficient[0]*y_eval + coefficient[1])**2)**1.5) / np.absolute(2*coefficient[0])
     return curvature
 ```
-
-<!-- Here the idea is to take the measurements of where the lane lines are and estimate how much the road is curving and where the vehicle is located with respect to the center of the lane. The radius of curvature may be given in meters assuming the curve of the road follows a circle. For the position of the vehicle, you may assume the camera is mounted at the center of the car and the deviation of the midpoint of the lane from the center of the image is the offset you're looking for. As with the polynomial fitting, convert from pixels to meters. -->
-
-<!-- TODO1:　ここも計算した内容を説明することにする 車線は線対称の為、近似誤差が小さいほうを採用するようにすればよい。プログラムでは書かない-->
+The radius of curvature is calculated for each of the left and right lanes, but the one with the smaller approximate error (RMS, etc.) of the approximate curve is adopted. This is because most lanes are symmetrical. Considering the middle of the photo as the center of the vehicle, the position of the vehicle on the road can be calculated by performing unit conversion [pixel / m] in the horizontal direction.
 
 ## 3. Lane line detection (movie)
 
 A result of movies in output_videos directory.
 A project_video_result_histogram.mp4 is movie file made by lane line detection algorithm at step 2.
+But the algorithm sometimes cannot detect lane line.
+
+I proposed two ideas and implemented algorithms.
+The first idea is to identify only the pixels around the approximate line of the previous frame as lane line.
+We can exclude pixcels detected outside the previous lane.
+Another idea is to leave the pixels detected in the previous frame.
+This idea improved approximation accuracy of the lane.
+Here, instead of leaving the pixel forever, we removed it with a 30% chance to avoid being too influenced by the past.
+Of the six images, the upper three images show before the idea is put in, and the lower three images show after the idea is put in.
+My idea shows that the lane detection accuracy has improved.
 
 [histo_1]: ./output_videos/histo_1.png
 [histo_2]: ./output_videos/histo_2.png
@@ -110,17 +117,10 @@ A project_video_result_histogram.mp4 is movie file made by lane line detection a
 | ---- | ---- | --- |
 | ![alt_txt][propose_1] | ![alt_txt][propose_2] | ![alt_txt][propose_3] |
 
-A result of movies in output_videos/project_video_result_histogram.mp4 and output_video/project_video_result_proposed.mp4.
-
-
-
-
-
-
-<!-- Provide a link to your final video output. Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!) -->
-
-<!-- ここにはイメージのパイプラインと変更した点を書いて、改善したことを伝える。動画から画像をキャプチャして比較する。 -->
-
 ## Discussion
 
-<!-- Briefly discuss any problems / issues you faced in your implementation of this project. Where will your pipeline likely fail? What could you do to make it more robust? -->
+### Weak to lane that cannot be detected in HLS color space
+
+My pipeline detects lane line in s color of HLS color space.
+For example, in a scene where a lane with low saturation continues, the lane cannot be specified.
+Therefore, I propose a more robust identification method by introducing an algorithm that estimates the road shape from past driving histories, an algorithm that estimates from the direction of the preceding vehicle.

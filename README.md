@@ -106,10 +106,9 @@ A project_video_result_histogram.mp4 is movie file made by lane line detection a
 [propose_2]: ./output_videos/propose_2.png
 [propose_3]: ./output_videos/propose_3.png
 
-| ![alt_txt][histo_1] | ![alt_txt][propose_1] |
-| ---- | ---- |
-| ![alt_txt][histo_2] | ![alt_txt][propose_1] |
-| ![alt_txt][histo_3] | ![alt_txt][propose_1] |
+| ![alt_txt][histo_1] | ![alt_txt][histo_2] | ![alt_txt][histo_3] |
+| ---- | ---- | --- |
+| ![alt_txt][propose_1] | ![alt_txt][propose_2] | ![alt_txt][propose_3] |
 
 A result of movies in output_videos/project_video_result_histogram.mp4 and output_video/project_video_result_proposed.mp4.
 

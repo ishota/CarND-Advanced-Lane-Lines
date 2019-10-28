@@ -82,6 +82,9 @@ def fit_polynomial(img, movie=False, pre_left_fit=None, pre_right_fit=None, left
     y = np.arange(img.shape[0], dtype=int)
     left_points = np.array([left_fitx, y]).T
     right_points = np.array([right_fitx, y]).T
+    all_points = np.concatenate([left_points, right_points], 0)
+    all_points = all_points[np.argsort(all_points[:, 1])]
+    all_points = all_points.reshape(1, -1, 2)
     left_points = left_points.reshape(1, -1, 2)
     right_points = right_points.reshape(1, -1, 2)
 
@@ -90,6 +93,10 @@ def fit_polynomial(img, movie=False, pre_left_fit=None, pre_right_fit=None, left
 
     cv2.polylines(out_img, left_points.astype(int), False, color=(255, 255, 0), thickness=10)
     cv2.polylines(out_img, right_points.astype(int), False, color=(255, 255, 0), thickness=10)
+    cv2.polylines(out_img, all_points.astype(int), False, color=(187, 190, 43), thickness=1)
+
+    # here put the position of the vehicle
+
 
     if movie:
         return out_img, compute_rial_curvature(left_fit), compute_rial_curvature(right_fit), \

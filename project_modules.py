@@ -35,8 +35,9 @@ def put_lane_information(img, polynomial_fit_img, curvatures):
                                     [MARGIN, img.shape[0]], [img.shape[1] - MARGIN, img.shape[0]]])
     inverse_t_mtx = cv2.getPerspectiveTransform(destination_point, SOURCE_POINT)
     original_view_line = cv2.warpPerspective(polynomial_fit_img, inverse_t_mtx, (img.shape[1], img.shape[0]))
-    line_img_idx = np.nonzero(original_view_line)
-    info_img[line_img_idx[0], line_img_idx[1], :] = original_view_line[line_img_idx[0], line_img_idx[1], :]
+    # line_img_idx = np.nonzero(original_view_line)
+    # info_img[line_img_idx[0], line_img_idx[1], :] = original_view_line[line_img_idx[0], line_img_idx[1], :]
+    info_img = cv2.addWeighted(info_img, 1, original_view_line, 0.5, 0)
     left_c = round(curvatures[0], 2)
     cv2.putText(info_img, str(left_c) + ' m', (200, 300), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 4)
     right_c = round(curvatures[1], 2)
@@ -88,12 +89,26 @@ def fit_polynomial(img, movie=False, pre_left_fit=None, pre_right_fit=None, left
     left_points = left_points.reshape(1, -1, 2)
     right_points = right_points.reshape(1, -1, 2)
 
+    # all_points = np.concatenate([left_points, right_points], 1)
+    # all_points.sort(axis=1)
+
     out_img[lefty, leftx] = [255, 0, 0]
     out_img[righty, rightx] = [0, 0, 255]
 
     cv2.polylines(out_img, left_points.astype(int), False, color=(255, 255, 0), thickness=10)
     cv2.polylines(out_img, right_points.astype(int), False, color=(255, 255, 0), thickness=10)
     cv2.polylines(out_img, all_points.astype(int), False, color=(187, 190, 43), thickness=1)
+
+    # cv2.polylines(out_img, left_points.astype(int), True, color=(255, 255, 0), thickness=10)
+    # cv2.polylines(out_img, right_points.astype(int), True, color=(255, 255, 0), thickness=10)
+
+    # dst = cv2.polylines(np.copy(out_img), all_points.astype(int), False, color=(187, 190, 43), thickness=1)
+
+    # out_img = cv2.addWeighted(img, 0.9, out_img, 0.1, 0)
+
+    # cv2.polylines(out_img, all_points.astype(int), False, color=(0, 150, 0), thickness=10)
+
+    # here put the rectified image
 
     # here put the position of the vehicle
 

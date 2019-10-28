@@ -89,29 +89,12 @@ def fit_polynomial(img, movie=False, pre_left_fit=None, pre_right_fit=None, left
     left_points = left_points.reshape(1, -1, 2)
     right_points = right_points.reshape(1, -1, 2)
 
-    # all_points = np.concatenate([left_points, right_points], 1)
-    # all_points.sort(axis=1)
-
     out_img[lefty, leftx] = [255, 0, 0]
     out_img[righty, rightx] = [0, 0, 255]
 
     cv2.polylines(out_img, left_points.astype(int), False, color=(255, 255, 0), thickness=10)
     cv2.polylines(out_img, right_points.astype(int), False, color=(255, 255, 0), thickness=10)
     cv2.polylines(out_img, all_points.astype(int), False, color=(187, 190, 43), thickness=1)
-
-    # cv2.polylines(out_img, left_points.astype(int), True, color=(255, 255, 0), thickness=10)
-    # cv2.polylines(out_img, right_points.astype(int), True, color=(255, 255, 0), thickness=10)
-
-    # dst = cv2.polylines(np.copy(out_img), all_points.astype(int), False, color=(187, 190, 43), thickness=1)
-
-    # out_img = cv2.addWeighted(img, 0.9, out_img, 0.1, 0)
-
-    # cv2.polylines(out_img, all_points.astype(int), False, color=(0, 150, 0), thickness=10)
-
-    # here put the rectified image
-
-    # here put the position of the vehicle
-
 
     if movie:
         return out_img, compute_rial_curvature(left_fit), compute_rial_curvature(right_fit), \

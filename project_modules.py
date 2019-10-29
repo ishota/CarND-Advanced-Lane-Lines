@@ -11,9 +11,9 @@ def find_movie_lane(img, pre_left_fit, pre_right_fit, left_dots, right_dots):
     gradient_threshold_img = apply_gradient_threshold(sobel_filtered_img)
     marge_img = marge_color_gradient_image(color_threshold_img, gradient_threshold_img, True)
     birds_eye_img = birds_eye_view(marge_img)
-    polynomial_fit_img, left_c, right_c, left_line, right_line, left_f, right_f, left_dots, right_dots \
+    polynomial_fit_img, left_c, right_c, left_line, right_line, left_f, right_f, left_dots, right_dots, position \
         = fit_polynomial(birds_eye_img, True, pre_left_fit, pre_right_fit, left_dots, right_dots)
-    info_img = put_lane_information(img, polynomial_fit_img, (left_c, right_c))
+    info_img = put_lane_information(img, polynomial_fit_img, (left_c, right_c), position)
     return info_img, left_f, right_f, left_dots, right_dots
 
 
@@ -24,24 +24,27 @@ def find_lane(img):
     gradient_threshold_img = apply_gradient_threshold(sobel_filtered_img)
     marge_img = marge_color_gradient_image(color_threshold_img, gradient_threshold_img, True)
     birds_eye_img = birds_eye_view(marge_img)
-    polynomial_fit_img, left_c, right_c, left_line, right_line = fit_polynomial(birds_eye_img)
-    info_img = put_lane_information(img, polynomial_fit_img, (left_c, right_c))
+    polynomial_fit_img, left_c, right_c, left_line, right_line, position = fit_polynomial(birds_eye_img)
+    info_img = put_lane_information(img, polynomial_fit_img, (left_c, right_c), position)
     return info_img
 
 
-def put_lane_information(img, polynomial_fit_img, curvatures):
+def put_lane_information(img, polynomial_fit_img, curvatures, position):
     info_img = np.copy(img)
     destination_point = np.float32([[MARGIN, 0], [img.shape[1] - MARGIN, 0],
                                     [MARGIN, img.shape[0]], [img.shape[1] - MARGIN, img.shape[0]]])
     inverse_t_mtx = cv2.getPerspectiveTransform(destination_point, SOURCE_POINT)
     original_view_line = cv2.warpPerspective(polynomial_fit_img, inverse_t_mtx, (img.shape[1], img.shape[0]))
-    # line_img_idx = np.nonzero(original_view_line)
-    # info_img[line_img_idx[0], line_img_idx[1], :] = original_view_line[line_img_idx[0], line_img_idx[1], :]
     info_img = cv2.addWeighted(info_img, 1, original_view_line, 0.5, 0)
     left_c = round(curvatures[0], 2)
-    cv2.putText(info_img, str(left_c) + ' m', (200, 300), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 4)
+    cv2.putText(info_img, 'Left Lane Curve', (200, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 4)
+    cv2.putText(info_img, str(left_c) + ' m', (200, 100), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 4)
     right_c = round(curvatures[1], 2)
-    cv2.putText(info_img, str(right_c) + ' m', (880, 300), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 4)
+    cv2.putText(info_img, 'Right Lane Curve', (880, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 4)
+    cv2.putText(info_img, str(right_c) + ' m', (880, 100), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 4)
+    position = round(position, 2)
+    cv2.putText(info_img, 'Center Offset m', (550, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 4)
+    cv2.putText(info_img, str(position) + ' m', (550, 100), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 4)
     return info_img
 
 
@@ -49,6 +52,19 @@ def compute_rial_curvature(coefficient):
     y_eval = CURVE_POINT*YM_PER_PIX
     curvature = ((1 + (2*coefficient[0]*y_eval + coefficient[1])**2)**1.5) / np.absolute(2*coefficient[0])
     return curvature
+
+
+def compute_rial_position(coef_left, coef_right):
+    left_x = coef_left[0] * 719 ** 2 + coef_left[1] * 719 + coef_left[2]
+    right_x = coef_right[0] * 719 ** 2 + coef_right[1] * 719 + coef_right[2]
+    mid_x = (right_x + left_x) // 2
+    position = mid_x - 640
+    position = position * XM_PER_PIX
+    left_c = ((1 + (2*coef_left[0]*719 + coef_left[1])**2)**1.5) / np.absolute(2*coef_left[0])
+    right_c = ((1 + (2*coef_right[0]*719 + coef_right[1])**2)**1.5) / np.absolute(2*coef_right[0])
+    left_c = left_c * YM_PER_PIX
+    right_c = right_c * YM_PER_PIX
+    return position, left_c, right_c
 
 
 def fit_polynomial(img, movie=False, pre_left_fit=None, pre_right_fit=None, left_dots=None, right_dots=None):
@@ -96,11 +112,13 @@ def fit_polynomial(img, movie=False, pre_left_fit=None, pre_right_fit=None, left
     cv2.polylines(out_img, right_points.astype(int), False, color=(255, 255, 0), thickness=10)
     cv2.polylines(out_img, all_points.astype(int), False, color=(187, 190, 43), thickness=1)
 
-    if movie:
-        return out_img, compute_rial_curvature(left_fit), compute_rial_curvature(right_fit), \
-               left_points, right_points, left_fit, right_fit, left_dots, right_dots
+    position, left_c, right_c = compute_rial_position(left_fit, right_fit)
 
-    return out_img, compute_rial_curvature(left_fit), compute_rial_curvature(right_fit), left_points, right_points
+    if movie:
+        return out_img, left_c, right_c, \
+               left_points, right_points, left_fit, right_fit, left_dots, right_dots, position
+
+    return out_img, left_c, right_c, left_points, right_points, position
 
 
 def drop_out_dots(left_dots, right_dots):

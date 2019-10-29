@@ -73,7 +73,7 @@ def main():
         axs[plot_count, i].imshow(find_lane(im_list[i]), cmap='gray')
 
     # save result at 'output_images' directory
-    plt.savefig('output_images/result_fine_lane.jpg')
+    plt.savefig('output_images/result_find_lane.jpg')
 
 
 if __name__ == '__main__':

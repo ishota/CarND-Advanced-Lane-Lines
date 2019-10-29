@@ -48,12 +48,6 @@ def put_lane_information(img, polynomial_fit_img, curvatures, position):
     return info_img
 
 
-def compute_rial_curvature(coefficient):
-    y_eval = CURVE_POINT*YM_PER_PIX
-    curvature = ((1 + (2*coefficient[0]*y_eval + coefficient[1])**2)**1.5) / np.absolute(2*coefficient[0])
-    return curvature
-
-
 def compute_rial_position(coef_left, coef_right):
     left_x = coef_left[0] * 719 ** 2 + coef_left[1] * 719 + coef_left[2]
     right_x = coef_right[0] * 719 ** 2 + coef_right[1] * 719 + coef_right[2]

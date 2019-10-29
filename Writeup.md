@@ -51,7 +51,7 @@ My pipeline consisted of 7 steps.
 6. Transform image perspective from original to birds eye view.
 7. Put a line approximated by a quadratic function on birds eye view image, then transform image to original view.
 
-[image_result]: ./output_images/result_fine_lane.jpg
+[image_result]: ./output_images/result_find_lane.jpg
 ![alt_txt][image_result]
 
 Above result is, from top to bottom, original image, HLS color scaled image, binary image made in step 2, x direction sobel filtered image, binary image made in step 4, marged binary image, birds eye view image, and original image with color lane line.
@@ -74,16 +74,21 @@ Next, I draw approximated line.
 I calculate a number of pixel which identified by previous function to detect area near lane line left and right separately.
 Then, I fit a quadratic function to pixel in the area.
 
-Finally I put the radius of curvature of each lane line on image.
-I use YM_PER_PIX 720 / 30 [pixel / m] and CURVE_POINT 50 to conversion in y from pixels space to meters.
-And I calculate curvature in below function.
+Finally I calculated the vehicle position with respect to the center of the lane and the radius of curvature of each lane line on image.
+I calculate them in below function.
 ```
-def compute_rial_curvature(coefficient):
-    y_eval = CURVE_POINT*YM_PER_PIX
-    curvature = ((1 + (2*coefficient[0]*y_eval + coefficient[1])**2)**1.5) / np.absolute(2*coefficient[0])
-    return curvature
+def compute_rial_position(coef_left, coef_right):
+    left_x = coef_left[0] * 719 ** 2 + coef_left[1] * 719 + coef_left[2]
+    right_x = coef_right[0] * 719 ** 2 + coef_right[1] * 719 + coef_right[2]
+    mid_x = (right_x + left_x) // 2
+    position = mid_x - 640
+    position = position * XM_PER_PIX
+    left_c = ((1 + (2*coef_left[0]*719 + coef_left[1])**2)**1.5) / np.absolute(2*coef_left[0])
+    right_c = ((1 + (2*coef_right[0]*719 + coef_right[1])**2)**1.5) / np.absolute(2*coef_right[0])
+    left_c = left_c * YM_PER_PIX
+    right_c = right_c * YM_PER_PIX
+    return position, left_c, right_c
 ```
-The radius of curvature is calculated for each of the left and right lanes, but the one with the smaller approximate error (RMS, etc.) of the approximate curve is adopted. This is because most lanes are symmetrical. Considering the middle of the photo as the center of the vehicle, the position of the vehicle on the road can be calculated by performing unit conversion [pixel / m] in the horizontal direction.
 
 ## 3. Lane line detection (movie)
 

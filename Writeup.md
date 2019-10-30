@@ -78,15 +78,15 @@ Finally I calculated the vehicle position with respect to the center of the lane
 I calculate them in below function.
 ```
 def compute_rial_position(coef_left, coef_right):
+    # calculate position of car
     left_x = coef_left[0] * 719 ** 2 + coef_left[1] * 719 + coef_left[2]
     right_x = coef_right[0] * 719 ** 2 + coef_right[1] * 719 + coef_right[2]
     mid_x = (right_x + left_x) // 2
     position = mid_x - 640
     position = position * XM_PER_PIX
-    left_c = ((1 + (2*coef_left[0]*719 + coef_left[1])**2)**1.5) / np.absolute(2*coef_left[0])
-    right_c = ((1 + (2*coef_right[0]*719 + coef_right[1])**2)**1.5) / np.absolute(2*coef_right[0])
-    left_c = left_c * YM_PER_PIX
-    right_c = right_c * YM_PER_PIX
+    # calculate radius of curvature in meters for both lane lines
+    left_c = ((1 + (2*coef_left[0]*719*YM_PER_PIX + coef_left[1])**2)**1.5) / np.absolute(2*coef_left[0])
+    right_c = ((1 + (2*coef_right[0]*719*YM_PER_PIX + coef_right[1])**2)**1.5) / np.absolute(2*coef_right[0])
     return position, left_c, right_c
 ```
 

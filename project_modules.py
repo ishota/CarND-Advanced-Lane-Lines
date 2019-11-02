@@ -5,12 +5,7 @@ import numpy as np
 
 
 def find_movie_lane(img, pre_left_fit, pre_right_fit, left_dots, right_dots):
-    s_channel_image = get_s_channel_image(img)
-    color_threshold_img = apply_color_threshold(s_channel_image)
-    sobel_filtered_img = apply_sobel_filter(s_channel_image)
-    gradient_threshold_img = apply_gradient_threshold(sobel_filtered_img)
-    marge_img = marge_color_gradient_image(color_threshold_img, gradient_threshold_img, True)
-    birds_eye_img = birds_eye_view(marge_img)
+    birds_eye_img = create_binary_img(img)
     polynomial_fit_img, left_c, right_c, left_line, right_line, left_f, right_f, left_dots, right_dots, position \
         = fit_polynomial(birds_eye_img, True, pre_left_fit, pre_right_fit, left_dots, right_dots)
     info_img = put_lane_information(img, polynomial_fit_img, (left_c, right_c), position)
@@ -18,19 +13,25 @@ def find_movie_lane(img, pre_left_fit, pre_right_fit, left_dots, right_dots):
 
 
 def find_lane(img):
-    s_channel_image = get_s_channel_image(img)
-    color_threshold_img = apply_color_threshold(s_channel_image)
-    sobel_filtered_img = apply_sobel_filter(s_channel_image)
-    gradient_threshold_img = apply_gradient_threshold(sobel_filtered_img)
-    marge_img = marge_color_gradient_image(color_threshold_img, gradient_threshold_img, True)
-    birds_eye_img = birds_eye_view(marge_img)
+    birds_eye_img = create_binary_img(img)
     polynomial_fit_img, left_c, right_c, left_line, right_line, position = fit_polynomial(birds_eye_img)
     info_img = put_lane_information(img, polynomial_fit_img, (left_c, right_c), position)
     return info_img
 
 
+def create_binary_img(img):
+    b_img = birds_eye_view(img)
+    s_channel_img = get_s_channel_image(b_img)
+    color_threshold_img = apply_color_threshold(s_channel_img)
+    sobel_filtered_img = apply_sobel_filter(s_channel_img)
+    gradient_threshold_img = apply_gradient_threshold(sobel_filtered_img)
+    marge_img = marge_color_gradient_image(color_threshold_img, gradient_threshold_img, True)
+    return marge_img
+
+
 def put_lane_information(img, polynomial_fit_img, curvatures, position):
     info_img = np.copy(img)
+    org_b_img = birds_eye_view(img)
     destination_point = np.float32([[MARGIN, 0], [img.shape[1] - MARGIN, 0],
                                     [MARGIN, img.shape[0]], [img.shape[1] - MARGIN, img.shape[0]]])
     inverse_t_mtx = cv2.getPerspectiveTransform(destination_point, SOURCE_POINT)
@@ -45,6 +46,10 @@ def put_lane_information(img, polynomial_fit_img, curvatures, position):
     position = round(position, 2)
     cv2.putText(info_img, 'Center Offset m', (550, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 4)
     cv2.putText(info_img, str(position) + ' m', (550, 100), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 4)
+    org_b_img = cv2.resize(org_b_img, (org_b_img.shape[1] // 2, org_b_img.shape[0] // 2))
+    polynomial_fit_img = cv2.resize(polynomial_fit_img, (polynomial_fit_img.shape[1] // 2, polynomial_fit_img.shape[0] // 2))
+    debug_info_img = cv2.hconcat([org_b_img, polynomial_fit_img])
+    info_img = cv2.vconcat([info_img, debug_info_img])
     return info_img
 
 

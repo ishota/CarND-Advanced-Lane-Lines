@@ -5,7 +5,7 @@ import numpy as np
 
 
 def find_movie_lane(img, pre_left_fit, pre_right_fit, left_dots, right_dots):
-    birds_eye_img = create_binary_img(img)
+    birds_eye_img = create_binary_b_img(img)
     polynomial_fit_img, left_c, right_c, left_line, right_line, left_f, right_f, left_dots, right_dots, position \
         = fit_polynomial(birds_eye_img, True, pre_left_fit, pre_right_fit, left_dots, right_dots)
     info_img = put_lane_information(img, polynomial_fit_img, (left_c, right_c), position)
@@ -13,13 +13,13 @@ def find_movie_lane(img, pre_left_fit, pre_right_fit, left_dots, right_dots):
 
 
 def find_lane(img):
-    birds_eye_img = create_binary_img(img)
+    birds_eye_img = create_binary_b_img(img)
     polynomial_fit_img, left_c, right_c, left_line, right_line, position = fit_polynomial(birds_eye_img)
     info_img = put_lane_information(img, polynomial_fit_img, (left_c, right_c), position)
     return info_img
 
 
-def create_binary_img(img):
+def create_binary_b_img(img):
     b_img = birds_eye_view(img)
     s_channel_img = get_s_channel_image(b_img)
     color_threshold_img = apply_color_threshold(s_channel_img)
@@ -49,7 +49,7 @@ def put_lane_information(img, polynomial_fit_img, curvatures, position):
     org_b_img = cv2.resize(org_b_img, (org_b_img.shape[1] // 2, org_b_img.shape[0] // 2))
     polynomial_fit_img = cv2.resize(polynomial_fit_img, (polynomial_fit_img.shape[1] // 2, polynomial_fit_img.shape[0] // 2))
     debug_info_img = cv2.hconcat([org_b_img, polynomial_fit_img])
-    info_img = cv2.vconcat([info_img, debug_info_img])
+    info_img = cv2.vconcat([debug_info_img, info_img])
     return info_img
 
 

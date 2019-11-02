@@ -48,16 +48,19 @@ def put_lane_information(img, polynomial_fit_img, curvatures, position):
     return info_img
 
 
-def compute_rial_position(coef_left, coef_right):
+def compute_rial_position(left_x, left_y, right_x, right_y):
+    # calculates the curvature of  polynomial function in meters (rial!)
+    left_fit_rial = np.polyfit(left_y*YM_PER_PIX, left_x*XM_PER_PIX, 2)
+    right_fit_rial = np.polyfit(right_y*YM_PER_PIX, right_x*XM_PER_PIX, 2)
+    left_c = ((1 + (2*left_fit_rial[0]*719*YM_PER_PIX + left_fit_rial[1])**2)**1.5) / np.absolute(2*left_fit_rial[0])
+    right_c = ((1 + (2*right_fit_rial[0]*719*YM_PER_PIX + right_fit_rial[1])**2)**1.5) / np.absolute(2*right_fit_rial[0])
+
     # calculate position of car
-    left_x = coef_left[0] * 719 ** 2 + coef_left[1] * 719 + coef_left[2]
-    right_x = coef_right[0] * 719 ** 2 + coef_right[1] * 719 + coef_right[2]
-    mid_x = (right_x + left_x) // 2
-    position = mid_x - 640
-    position = position * XM_PER_PIX
-    # calculate radius of curvature in meters for both lane lines
-    left_c = ((1 + (2*coef_left[0]*719*YM_PER_PIX + coef_left[1])**2)**1.5) / np.absolute(2*coef_left[0])
-    right_c = ((1 + (2*coef_right[0]*719*YM_PER_PIX + coef_right[1])**2)**1.5) / np.absolute(2*coef_right[0])
+    left_x = left_fit_rial[0] * 719 * YM_PER_PIX ** 2 + left_fit_rial[1] * 719 * YM_PER_PIX + left_fit_rial[2]
+    right_x = right_fit_rial[0] * 719 * YM_PER_PIX ** 2 + right_fit_rial[1] * 719 * YM_PER_PIX + right_fit_rial[2]
+    mid_x = (right_x + left_x) / 2
+    lane_width = right_x - left_x
+    position = (mid_x - 640 * XM_PER_PIX) * 3.7 / lane_width
     return position, left_c, right_c
 
 
@@ -106,7 +109,7 @@ def fit_polynomial(img, movie=False, pre_left_fit=None, pre_right_fit=None, left
     cv2.polylines(out_img, right_points.astype(int), False, color=(255, 255, 0), thickness=10)
     cv2.polylines(out_img, all_points.astype(int), False, color=(187, 190, 43), thickness=1)
 
-    position, left_c, right_c = compute_rial_position(left_fit, right_fit)
+    position, left_c, right_c = compute_rial_position(leftx, lefty, rightx, righty)
 
     if movie:
         return out_img, left_c, right_c, \

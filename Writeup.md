@@ -77,16 +77,19 @@ Then, I fit a quadratic function to pixel in the area.
 Finally I calculated the vehicle position with respect to the center of the lane and the radius of curvature of each lane line on image.
 I calculate them in below function.
 ```
-def compute_rial_position(coef_left, coef_right):
+def compute_rial_position(left_x, left_y, right_x, right_y):
+    # calculates the curvature of  polynomial function in meters (rial!)
+    left_fit_rial = np.polyfit(left_y*YM_PER_PIX, left_x*XM_PER_PIX, 2)
+    right_fit_rial = np.polyfit(right_y*YM_PER_PIX, right_x*XM_PER_PIX, 2)
+    left_c = ((1 + (2*left_fit_rial[0]*719*YM_PER_PIX + left_fit_rial[1])**2)**1.5) / np.absolute(2*left_fit_rial[0])
+    right_c = ((1 + (2*right_fit_rial[0]*719*YM_PER_PIX + right_fit_rial[1])**2)**1.5) / np.absolute(2*right_fit_rial[0])
+
     # calculate position of car
-    left_x = coef_left[0] * 719 ** 2 + coef_left[1] * 719 + coef_left[2]
-    right_x = coef_right[0] * 719 ** 2 + coef_right[1] * 719 + coef_right[2]
-    mid_x = (right_x + left_x) // 2
-    position = mid_x - 640
-    position = position * XM_PER_PIX
-    # calculate radius of curvature in meters for both lane lines
-    left_c = ((1 + (2*coef_left[0]*719*YM_PER_PIX + coef_left[1])**2)**1.5) / np.absolute(2*coef_left[0])
-    right_c = ((1 + (2*coef_right[0]*719*YM_PER_PIX + coef_right[1])**2)**1.5) / np.absolute(2*coef_right[0])
+    left_x = left_fit_rial[0] * 719 * YM_PER_PIX ** 2 + left_fit_rial[1] * 719 * YM_PER_PIX + left_fit_rial[2]
+    right_x = right_fit_rial[0] * 719 * YM_PER_PIX ** 2 + right_fit_rial[1] * 719 * YM_PER_PIX + right_fit_rial[2]
+    mid_x = (right_x + left_x) / 2
+    lane_width = right_x - left_x
+    position = (mid_x - 640 * XM_PER_PIX) * 3.7 / lane_width
     return position, left_c, right_c
 ```
 

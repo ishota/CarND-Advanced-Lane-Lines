@@ -69,10 +69,10 @@ def compute_rial_position(left_x, left_y, right_x, right_y):
     return position, left_c, right_c
 
 
-def fit_polynomial(img, movie=False, pre_left_fit=None, pre_right_fit=None, left_dots=None, right_dots=None):
+def fit_polynomial(img, movie=False, pre_left_fit=None, pre_right_fit=None, pre_left_dots=None, pre_right_dots=None):
     if pre_left_fit is not None and pre_right_fit is not None:
         leftx, lefty, rightx, righty, left_dots, right_dots, out_img = \
-            region_of_pre_fit(img, pre_left_fit, pre_right_fit, left_dots, right_dots)
+            region_of_pre_fit(img, pre_left_fit, pre_right_fit, pre_left_dots, pre_right_dots)
     else:
         leftx, lefty, rightx, righty, out_img = region_of_interest(img)
         left_dots = np.stack([leftx, lefty])
@@ -121,6 +121,24 @@ def fit_polynomial(img, movie=False, pre_left_fit=None, pre_right_fit=None, left
                left_points, right_points, left_fit, right_fit, left_dots, right_dots, position
 
     return out_img, left_c, right_c, left_points, right_points, position
+
+
+def remain_sanity_lane(ploty, left_fit, right_fit, pre_left_fit, pre_right_fit, threshold=15):
+    left_fitx = left_fit[0] * ploty ** 2 + left_fit[1] * ploty + left_fit[2]
+    right_fitx = right_fit[0] * ploty ** 2 + right_fit[1] * ploty + right_fit[2]
+    pre_left_fitx = pre_left_fit[0] * ploty ** 2 + pre_left_fit[1] * ploty + pre_left_fit[2]
+    pre_right_fitx = pre_right_fit[0] * ploty ** 2 + pre_right_fit[1] * ploty + pre_right_fit[2]
+    print(np.average(np.abs(left_fitx - pre_left_fitx)))
+    print(np.average(np.abs(right_fitx - pre_right_fitx)))
+    if np.average(np.abs(left_fitx - pre_left_fitx)) > threshold:
+        print("left reject")
+        left_fit = pre_left_fit
+        left_fitx = pre_left_fitx
+    if np.average(np.abs(right_fitx - pre_right_fitx)) > threshold:
+        print("right reject")
+        right_fit = pre_right_fit
+        right_fitx = pre_right_fitx
+    return left_fit, right_fit, left_fitx, right_fitx
 
 
 def drop_out_dots(left_dots, right_dots):
